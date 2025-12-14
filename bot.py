@@ -127,7 +127,21 @@ async def checker_loop(bot: Bot):
                                 state[str(chat_id)] = cfg
                                 save_state(state)
 
-                                link = aviasales_deeplink(origin, dest, depart, None)
+                                # Самый правильный линк — из API (если он есть)
+api_link = best.get("link")
+if api_link:
+    # По документации: добавляем к https://www.aviasales.ru/search/
+    link = "https://www.aviasales.ru/search/" + api_link.lstrip("/")
+else:
+    # Фолбэк на стандартную ссылку результатов (если вдруг link нет)
+    link = (
+        f"https://search.aviasales.com/flights/"
+        f"?origin_iata={origin}&destination_iata={dest}"
+        f"&depart_date={depart}"
+        f"&adults=1&children=0&infants=0&trip_class=0"
+        f"&locale=ru&one_way=true"
+    )
+
                                 kb = InlineKeyboardMarkup(inline_keyboard=[[
                                     InlineKeyboardButton(text="Открыть в Aviasales", url=link)
                                 ]])
