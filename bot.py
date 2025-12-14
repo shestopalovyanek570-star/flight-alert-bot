@@ -35,18 +35,7 @@ def save_state(state: dict) -> None:
     with open(STATE_FILE, "w", encoding="utf-8") as f:
         json.dump(state, f, ensure_ascii=False, indent=2)
 
-api_link = best.get("link")
-if api_link:
-    link = "https://www.aviasales.ru/search/" + str(api_link).lstrip("/")
-else:
-    link = (
-        f"https://search.aviasales.com/flights/"
-        f"?origin_iata={origin}&destination_iata={dest}"
-        f"&depart_date={depart}"
-        f"&adults=1&children=0&infants=0&trip_class=0"
-        f"&locale=ru&one_way=true"
-    )
-
+def aviasales_deeplink(origin: str, dest: str, depart: str, ret: str | None) -> str:
     # Deeplink на форму поиска Aviasales (параметры origin_iata/destination_iata/depart_date/return_date)
     # Подобные параметры используются в ссылках белой метки/формы поиска :contentReference[oaicite:5]{index=5}
     base = "https://search.aviasales.com/flights/"
@@ -138,21 +127,7 @@ async def checker_loop(bot: Bot):
                                 state[str(chat_id)] = cfg
                                 save_state(state)
 
-                                # Самый правильный линк — из API (если он есть)
-api_link = best.get("link")
-if api_link:
-    # По документации: добавляем к https://www.aviasales.ru/search/
-    link = "https://www.aviasales.ru/search/" + api_link.lstrip("/")
-else:
-    # Фолбэк на стандартную ссылку результатов (если вдруг link нет)
-    link = (
-        f"https://search.aviasales.com/flights/"
-        f"?origin_iata={origin}&destination_iata={dest}"
-        f"&depart_date={depart}"
-        f"&adults=1&children=0&infants=0&trip_class=0"
-        f"&locale=ru&one_way=true"
-    )
-
+                                link = aviasales_deeplink(origin, dest, depart, None)
                                 kb = InlineKeyboardMarkup(inline_keyboard=[[
                                     InlineKeyboardButton(text="Открыть в Aviasales", url=link)
                                 ]])
