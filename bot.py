@@ -127,7 +127,7 @@ async def checker_loop(bot: Bot):
                                 state[str(chat_id)] = cfg
                                 save_state(state)
 
-                                link = aviasales_deeplink(origin, dest, depart, None)
+                                link = ("https://search.aviasales.com" + str(best.get("link")).lstrip("/")) if best.get("link") else aviasales_deeplink(origin, dest, depart, None)
                                 kb = InlineKeyboardMarkup(inline_keyboard=[[
                                     InlineKeyboardButton(text="Открыть в Aviasales", url=link)
                                 ]])
